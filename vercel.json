@@ -4,10 +4,12 @@
     {
       "src": "api/generate-image.js",
       "use": "@vercel/node"
-    },
+    }
+  ],
+  "routes": [
     {
-      "src": "index.html",
-      "use": "@vercel/static"
+      "src": "/api/generate-image",
+      "dest": "api/generate-image.js"
     }
   ]
 }
