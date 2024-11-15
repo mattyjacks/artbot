@@ -1,19 +1,23 @@
 const axios = require('axios');
 
 module.exports = async (req, res) => {
-    // Log the request body
-    console.log('Request body:', req.body);
+    // Allow all origins or specify one (for example, 'https://yourfrontend.com')
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Replace '*' with your domain if you want to restrict access
+    res.setHeader('Access-Control-Allow-Methods', 'POST'); // Allow POST requests
+
+    // If it's a preflight OPTIONS request, respond with 200
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
 
     // Ensure it's a POST request
     if (req.method !== 'POST') {
-        console.error('Invalid method:', req.method);
         return res.status(405).json({ error: 'Method not allowed. Use POST.' });
     }
 
     // Ensure a prompt is provided in the body of the request
     const { prompt } = req.body;
     if (!prompt) {
-        console.error('No prompt provided.');
         return res.status(400).json({ error: 'Prompt is required.' });
     }
 
@@ -34,25 +38,13 @@ module.exports = async (req, res) => {
             }
         );
 
-        // Log the response data
-        console.log('OpenAI response:', response.data);
+        // Log the response for debugging
+        console.log('OpenAI API Response:', response.data);
 
         // Send back the image URL
         res.status(200).json({ imageUrl: response.data.data[0].url });
     } catch (error) {
-        // Log detailed error information
-        console.error('Error generating image:', error.message);
-        if (error.response) {
-            console.error('Response data:', error.response.data);
-            console.error('Response status:', error.response.status);
-            console.error('Response headers:', error.response.headers);
-        } else if (error.request) {
-            console.error('Request data:', error.request);
-        } else {
-            console.error('Error message:', error.message);
-        }
-
-        // Send a general error message
-        res.status(500).json({ error: 'Failed to generate image. Check logs for more details.' });
+        console.error('Error generating image:', error);
+        res.status(500).json({ error: 'Failed to generate image.' });
     }
 };
