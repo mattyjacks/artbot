@@ -32,7 +32,23 @@ module.exports = async (req, res) => {
         // Send back the image URL
         res.status(200).json({ imageUrl: response.data.data[0].url });
     } catch (error) {
-        console.error('Error generating image:', error);
-        res.status(500).json({ error: 'Failed to generate image.' });
+        // Log detailed error information
+        console.error('Error generating image:', error.message);
+        
+        // Check if error response contains useful data
+        if (error.response) {
+            console.error('Response data:', error.response.data);
+            console.error('Response status:', error.response.status);
+            console.error('Response headers:', error.response.headers);
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error('Request data:', error.request);
+        } else {
+            // An error occurred while setting up the request
+            console.error('Error message:', error.message);
+        }
+
+        // Send a general error message
+        res.status(500).json({ error: 'Failed to generate image. Check logs for more details.' });
     }
 };
