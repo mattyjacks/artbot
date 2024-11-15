@@ -1,14 +1,19 @@
 const axios = require('axios');
 
 module.exports = async (req, res) => {
+    // Log the request body
+    console.log('Request body:', req.body);
+
     // Ensure it's a POST request
     if (req.method !== 'POST') {
+        console.error('Invalid method:', req.method);
         return res.status(405).json({ error: 'Method not allowed. Use POST.' });
     }
 
     // Ensure a prompt is provided in the body of the request
     const { prompt } = req.body;
     if (!prompt) {
+        console.error('No prompt provided.');
         return res.status(400).json({ error: 'Prompt is required.' });
     }
 
@@ -29,22 +34,21 @@ module.exports = async (req, res) => {
             }
         );
 
+        // Log the response data
+        console.log('OpenAI response:', response.data);
+
         // Send back the image URL
         res.status(200).json({ imageUrl: response.data.data[0].url });
     } catch (error) {
         // Log detailed error information
         console.error('Error generating image:', error.message);
-        
-        // Check if error response contains useful data
         if (error.response) {
             console.error('Response data:', error.response.data);
             console.error('Response status:', error.response.status);
             console.error('Response headers:', error.response.headers);
         } else if (error.request) {
-            // The request was made but no response was received
             console.error('Request data:', error.request);
         } else {
-            // An error occurred while setting up the request
             console.error('Error message:', error.message);
         }
 
