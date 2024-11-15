@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DALLE 3 Image Generator</title>
+</head>
+<body>
+    <h1>Generate an Image</h1>
+    <form id="image-form">
+        <textarea id="prompt" placeholder="Enter a description"></textarea>
+        <button type="submit">Generate</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        const form = document.getElementById('image-form');
+        const resultDiv = document.getElementById('result');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const prompt = document.getElementById('prompt').value;
+
+            resultDiv.innerHTML = 'Loading...';
+
+            try {
+                const response = await fetch('/api/generate-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const data = await response.json();
+                if (data.error) {
+                    resultDiv.innerHTML = `Error: ${data.error}`;
+                } else {
+                    const img = document.createElement('img');
+                    img.src = data.data[0].url;
+                    resultDiv.innerHTML = '';
+                    resultDiv.appendChild(img);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = 'Failed to generate image.';
+            }
+        });
+    </script>
+</body>
+</html>
